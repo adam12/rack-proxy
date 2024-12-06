@@ -140,7 +140,13 @@ module Rack
         target_response.cert = @cert if @cert
         target_response.key = @key if @key
       else
-        http = Net::HTTP.new(backend.host, backend.port)
+        proxy_address = @opts.dig(:proxy, :host)
+        proxy_port = @opts.dig(:proxy, :port)
+        proxy_user = @opts.dig(:proxy, :user)
+        proxy_password = @opts.dig(:proxy, :password)
+        proxy_disabled = proxy_address.nil? && proxy_port.nil?
+
+        http = Net::HTTP.new(backend.host, backend.port, proxy_address, proxy_port, proxy_user, proxy_password, proxy_disabled)
         http.use_ssl = use_ssl if use_ssl
         http.read_timeout = read_timeout
         http.ssl_version = @ssl_version if @ssl_version
